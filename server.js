@@ -14,11 +14,11 @@ app.use(bodyParser.json());
 // Import route files
 const userRoutes = require('./routes/users');
 // const packageRoutes = require('./routes/package');
-// const bookingRoutes = require('./routes/booking');
+const bookingRoutes = require('./routes/bookings');
 // Use route middleware
 app.use('/users', userRoutes);
+app.use('/bookings', bookingRoutes);
 // app.use('/packages', packageRoutes);
-// app.use('/bookings', bookingRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

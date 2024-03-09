@@ -24,7 +24,7 @@ module.exports = {
   },
 
   generateAccessToken : (username) => {
-    return jwt.sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+    return jwt.sign(username, process.env.TOKEN_SECRET, { expiresIn: '1000000000s' });
   },
   
   generateRandomToken : () => {

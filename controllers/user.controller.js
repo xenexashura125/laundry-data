@@ -62,21 +62,26 @@ module.exports = {
   signUp: async (req, res) => {
     const { firstname, lastname, email, type, password, contact_no } = req.body;
     try {
-      // Hash the password
-      const hash = await bcrypt.hash(password, 10);
+        // Check if the email already exists in the database
+        const [existingUsers] = await db.execute('SELECT * FROM user_tbl WHERE email = ?', [email]);
+        if (existingUsers.length > 0) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
 
-      // Insert the hashed password into the database
-      const sql = 'INSERT INTO user_tbl (firstname, lastname, email, type, password, contact_no) VALUES (?, ?, ?, ?, ?, ?)';
-      const values = [firstname, lastname, email, type, hash, contact_no];
+        // Hash the password
+        const hash = await bcrypt.hash(password, 10);
 
-      const [result] = await db.execute(sql, values);
-      res.status(201).json({ message: 'Created successfully', id: result.insertId });
+        // Insert the hashed password into the database
+        const sql = 'INSERT INTO user_tbl (firstname, lastname, email, type, password, contact_no) VALUES (?, ?, ?, ?, ?, ?)';
+        const values = [firstname, lastname, email, type, hash, contact_no];
+
+        const [result] = await db.execute(sql, values);
+        res.status(201).json({ message: 'Created successfully', id: result.insertId });
     } catch (err) {
-      console.error('Error creating user:', err);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error('Error creating user:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
   },
-
   forgotPassword: async (req, res) => {
     try {
       const { email } = req.body;
@@ -244,10 +249,11 @@ module.exports = {
   updateById : async(req, res) => {
     try {
       let { id } = req.params;
-      const { firstname, lastname, email, password } = req.body;
-      const sql = 'UPDATE user_tbl SET firstname = ?, lastname = ?, email = ?, password = ? WHERE id = ?';
-      const hash = await bcrypt.hash(password, 10);
-      const [result] = await db.execute(sql, [firstname, lastname, email, hash, id]);
+      const { firstname, lastname, email,type,contact_no } = req.body;
+      console.log(req.body)
+      const sql = 'UPDATE user_tbl SET firstname = ?, lastname = ?, email = ?, type = ?, contact_no = ? WHERE id = ?';
+      const [result] = await db.execute(sql, [firstname, lastname, email, type, contact_no, id,]);
+      console.log(result)
       if (result.affectedRows === 0) {
         return res.status(404).json({ message: 'No data found to update', status: 404 })
       }
